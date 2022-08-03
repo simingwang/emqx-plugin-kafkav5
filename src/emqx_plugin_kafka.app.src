@@ -1,0 +1,14 @@
+{application, emqx_plugin_template,
+ [{description, "EMQX Plugin -kafka-with brod"},
+  {vsn, "5.0.0"},
+  {modules, []},
+  {registered, [emqx_plugin_kafka_sup]},
+  {applications, [kernel,stdlib,map_sets]},
+  {mod, {emqx_plugin_kafka_app,[]}},
+  {env, []},
+  {licenses, ["Apache-2.0"]},
+  {maintainers, ["SimingWong <376210268@qq.com>"]},
+  {links, [{"Homepage", "https://emqx.io/"},
+           {"Github", "https://github.com/emqx/emqx-plugin-template"}
+          ]}
+ ]}.
