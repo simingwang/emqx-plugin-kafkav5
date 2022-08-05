@@ -9,6 +9,6 @@
   {licenses, ["Apache-2.0"]},
   {maintainers, ["SimingWong <376210268@qq.com>"]},
   {links, [{"Homepage", "https://emqx.io/"},
-           {"Github", "https://github.com/emqx/emqx-plugin-template"}
+           {"Github", "https://github.com/simingwang/emqx-plugin-kafkav5"}
           ]}
  ]}.
