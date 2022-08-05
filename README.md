@@ -19,3 +19,9 @@ Execute `make rel` to have the package created like:
 _build/default/emqx_plugrel/emqx_plugin_template-<vsn>.tar.gz
 ```
 See EMQX documents for details on how to deploy the plugin.
+
+1. need to set NIF_BIN_DIR to /usr/lib64  
+   text "export NIF_BIN_DIR = /ust/lib64" to  /etc/profile 
+2. put all plugin's  *.so file to  /usr/lib64
+
+
