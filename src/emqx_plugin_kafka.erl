@@ -255,21 +255,22 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  {ok, AddressList} = application:get_env(emqx_plugin_kafka, kafka_address_list),
-  io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  {ok, KafkaConfig} = application:get_env(emqx_plugin_kafka, kafka_config),
-  io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
-  {ok, KafkaTopic} = application:get_env(emqx_plugin_kafka, topic),
-  io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
+  % {ok, AddressList} = application:get_env(emqx_plugin_kafka, kafka_address_list),
+  % io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
+  % {ok, KafkaConfig} = application:get_env(emqx_plugin_kafka, kafka_config),
+  % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
+  % {ok, KafkaTopic} = application:get_env(emqx_plugin_kafka, topic),
+  % io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   %%{ok, _} = application:ensure_all_started(brod),
   %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
   %%ok = brod:start_producer(emqx_repost_worker, KafkaTopic, []),
   {ok, _} = application:ensure_all_started(brod),
   %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092}],
-  Topic = list_to_binary(KafkaTopic),
-  %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
-  ok = brod:start_client(AddressList, client1),
-  ok = brod:start_producer(client1,Topic, _ProducerConfig = []),
+  %Topic = list_to_binary(KafkaTopic),
+  Topic = <<"test-topic">>,
+  KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
+  ok = brod:start_client(KafkaBootstrapEndpoints, client1),
+  ok = brod:start_producer(client1, Topic, _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
