@@ -327,7 +327,7 @@ unload() ->
   emqx:unhook('message.dropped', {?MODULE, on_message_dropped}).
 
 produce_kafka_payload(Key, Message) ->
-  Topic = list_to_binary(get_kafka_topic()),
+  Topic = get_kafka_topic(),
   {ok, MessageBody} = emqx_json:safe_encode(Message),
   io:format("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
   io:format("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
