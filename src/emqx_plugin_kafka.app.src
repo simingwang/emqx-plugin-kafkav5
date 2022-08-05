@@ -1,4 +1,4 @@
-{application, emqx_plugin_template,
+{application, emqx_plugin_kafka,
  [{description, "EMQX Plugin -kafka-with brod"},
   {vsn, "5.0.0"},
   {modules, []},
