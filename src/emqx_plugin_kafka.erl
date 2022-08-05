@@ -274,8 +274,8 @@ kafka_init(_Env) ->
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
-  {ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
-  Topic.
+  %{ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
+  Topic = <<"test-topic">>.
 
 
 format_payload(Message) ->
