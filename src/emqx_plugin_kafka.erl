@@ -81,18 +81,15 @@ load(Env) ->
   emqx:hook('message.dropped', {?MODULE, on_message_dropped, [Env]}).
 
 on_client_connect(ConnInfo = #{clientid := ClientId}, Props, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connect, ConnInfo: ~p, Props: ~p~n",
-    [ClientId, ConnInfo, Props]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connect, ConnInfo: ~p, Props: ~p~n",  [ClientId, ConnInfo, Props]),
   ok.
 
 on_client_connack(ConnInfo = #{clientid := ClientId}, Rc, Props, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connack, ConnInfo: ~p, Rc: ~p, Props: ~p~n",
-    [ClientId, ConnInfo, Rc, Props]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connack, ConnInfo: ~p, Rc: ~p, Props: ~p~n", [ClientId, ConnInfo, Rc, Props]),
   ok.
 
 on_client_connected(ClientInfo = #{clientid := ClientId}, ConnInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connected, ClientInfo:~n~p~n, ConnInfo:~n~p~n",
-    [ClientId, ClientInfo, ConnInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) connected, ClientInfo:~n~p~n, ConnInfo:~n~p~n",[ClientId, ClientInfo, ConnInfo]),
   {IpAddr, _Port} = maps:get(peername, ConnInfo),
   Action = <<"connected">>,
   Now = now_mill_secs(os:timestamp()),
@@ -112,8 +109,7 @@ on_client_connected(ClientInfo = #{clientid := ClientId}, ConnInfo, _Env) ->
   ok.
 
 on_client_disconnected(ClientInfo = #{clientid := ClientId}, ReasonCode, ConnInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) disconnected due to ~p, ClientInfo:~n~p~n, ConnInfo:~n~p~n",
-    [ClientId, ReasonCode, ClientInfo, ConnInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) disconnected due to ~p, ClientInfo:~n~p~n, ConnInfo:~n~p~n", [ClientId, ReasonCode, ClientInfo, ConnInfo]),
   Action = <<"disconnected">>,
   Now = now_mill_secs(os:timestamp()),
   Online = 0,
@@ -129,17 +125,17 @@ on_client_disconnected(ClientInfo = #{clientid := ClientId}, ReasonCode, ConnInf
   ok.
 
 on_client_authenticate(_ClientInfo = #{clientid := ClientId}, Result, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) authenticate, Result:~n~p~n", [ClientId, Result]),
+ %%  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) authenticate, Result:~n~p~n", [ClientId, Result]),
   ok.
 
 on_client_check_acl(_ClientInfo = #{clientid := ClientId}, Topic, PubSub, Result, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) check_acl, PubSub:~p, Topic:~p, Result:~p~n",
+ %%  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) check_acl, PubSub:~p, Topic:~p, Result:~p~n",
     [ClientId, PubSub, Topic, Result]),
   ok.
 
 %%---------------------------client subscribe start--------------------------%%
 on_client_subscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) will subscribe: ~p~n", [ClientId, TopicFilters]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) will subscribe: ~p~n", [ClientId, TopicFilters]),
   Topic = erlang:element(1, erlang:hd(TopicFilters)),
   Qos = erlang:element(2, lists:last(TopicFilters)),
   Action = <<"subscribe">>,
@@ -155,7 +151,7 @@ on_client_subscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) ->
   ok.
 %%---------------------client subscribe stop----------------------%%
 on_client_unsubscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Client(~s) will unsubscribe ~p~n", [ClientId, TopicFilters]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) will unsubscribe ~p~n", [ClientId, TopicFilters]),
   Topic = erlang:element(1, erlang:hd(TopicFilters)),
   Action = <<"unsubscribe">>,
   Now = now_mill_secs(os:timestamp()),
@@ -171,8 +167,7 @@ on_client_unsubscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) 
 on_message_dropped(#message{topic = <<"$SYS/", _/binary>>}, _By, _Reason, _Env) ->
   ok;
 on_message_dropped(Message, _By = #{node := Node}, Reason, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Message dropped by node ~s due to ~s: ~s~n",
-    [Node, Reason, emqx_message:format(Message)]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Message dropped by node ~s due to ~s: ~s~n",  [Node, Reason, emqx_message:format(Message)]),
   ok.
 
 
@@ -186,8 +181,7 @@ on_message_publish(Message, _Env) ->
 %%---------------------message publish stop----------------------%%
 
 on_message_delivered(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Message delivered to client(~s): ~s~n",
-    [ClientId, emqx_message:format(Message)]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Message delivered to client(~s): ~s~n", [ClientId, emqx_message:format(Message)]),
   Topic = Message#message.topic,
   Payload = Message#message.payload,
   Qos = Message#message.qos,
@@ -207,8 +201,7 @@ on_message_delivered(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
   ok.
 
 on_message_acked(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Message acked by client(~s): ~s~n",
-    [ClientId, emqx_message:format(Message)]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Message acked by client(~s): ~s~n",[ClientId, emqx_message:format(Message)]),
   Topic = Message#message.topic,
   Payload = Message#message.payload,
   Qos = Message#message.qos,
@@ -232,33 +225,32 @@ on_message_acked(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
 %%--------------------------------------------------------------------
 
 on_session_created(#{clientid := ClientId}, SessInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) created, Session Info:~n~p~n", [ClientId, SessInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) created, Session Info:~n~p~n", [ClientId, SessInfo]),
   ok.
 
 
 on_session_subscribed(#{clientid := ClientId}, Topic, SubOpts, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) subscribed ~s with subopts: ~p~n", [ClientId, Topic, SubOpts]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) subscribed ~s with subopts: ~p~n", [ClientId, Topic, SubOpts]),
   ok.
 
 on_session_unsubscribed(#{clientid := ClientId}, Topic, Opts, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) unsubscribed ~s with opts: ~p~n", [ClientId, Topic, Opts]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) unsubscribed ~s with opts: ~p~n", [ClientId, Topic, Opts]),
   ok.
 
 on_session_resumed(#{clientid := ClientId}, SessInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) resumed, Session Info:~n~p~n", [ClientId, SessInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) resumed, Session Info:~n~p~n", [ClientId, SessInfo]),
   ok.
 
 on_session_discarded(_ClientInfo = #{clientid := ClientId}, SessInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is discarded. Session Info: ~p~n", [ClientId, SessInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is discarded. Session Info: ~p~n", [ClientId, SessInfo]),
   ok.
 
 on_session_takeovered(_ClientInfo = #{clientid := ClientId}, SessInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is takeovered. Session Info: ~p~n", [ClientId, SessInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is takeovered. Session Info: ~p~n", [ClientId, SessInfo]),
   ok.
 
 on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _Env) ->
-  ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is terminated due to ~p~nSession Info: ~p~n",
-    [ClientId, Reason, SessInfo]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Session(~s) is terminated due to ~p~nSession Info: ~p~n",[ClientId, Reason, SessInfo]),
   ok.
 
 kafka_init(_Env) ->
@@ -337,8 +329,8 @@ unload() ->
 produce_kafka_payload(Key, Message) ->
   Topic = list_to_binary(get_kafka_topic()),
   {ok, MessageBody} = emqx_json:safe_encode(Message),
-  ?LOG_INFO("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
-  ?LOG_INFO("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
+  %% ?LOG_INFO("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
   Payload = iolist_to_binary(MessageBody),
   %%brod:produce_cb(client1, Topic, hash, Key, Payload, fun(_,_) -> ok end),
   AckCb = fun(Partition, BaseOffset) -> io:format(user, "\nProduced to partition ~p at base-offset ~p\n", [Partition, BaseOffset]) end,
