@@ -255,12 +255,13 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  % {ok, AddressList} = application:get_env(emqx_plugin_kafka, kafka_address_list),
-  % io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  % {ok, KafkaConfig} = application:get_env(emqx_plugin_kafka, kafka_config),
+  AddressList = maps:get(address_list, _Env),
+  io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
+  ReconnectCoolDownSeconds = maps:get(reconnect_cool_down_seconds,_Env),
+  QueryApiVersions = maps:get(query_api_versions,_Env),
   % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
-  % {ok, KafkaTopic} = application:get_env(emqx_plugin_kafka, topic),
-  % io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
+  KafkaTopic = maps:get(topic, _Env),
+  io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   %%{ok, _} = application:ensure_all_started(brod),
   %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
   %%ok = brod:start_producer(emqx_repost_worker, KafkaTopic, []),
