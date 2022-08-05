@@ -88,7 +88,7 @@ on_client_connect(ConnInfo = #{clientid := ClientId}, Props, _Env) ->
   {ok, Props}. 
 
 on_client_connack(ConnInfo = #{clientid := ClientId}, Rc, Props, _Env) ->
-  ?SLOG("Client(~s) connack, ConnInfo: ~p, Rc: ~p, Props: ~p~n",
+  io:format("Client(~s) connack, ConnInfo: ~p, Rc: ~p, Props: ~p~n",
               [ClientId, ConnInfo, Rc, Props]),
   {ok, Props}.
 
@@ -109,7 +109,7 @@ on_client_connected(ClientInfo = #{clientid := ClientId}, ConnInfo, _Env) ->
     {online, Online}
   ],
   produce_kafka_payload(ClientId, Payload),
-  ?SLOG("Client(~s) connected, ClientInfo:~n~p~n, ConnInfo:~n~p~n", [ClientId, ClientInfo, ConnInfo]).
+  io:format("Client(~s) connected, ClientInfo:~n~p~n, ConnInfo:~n~p~n", [ClientId, ClientInfo, ConnInfo]).
 
 on_client_disconnected(ClientInfo = #{clientid := ClientId}, ReasonCode, ConnInfo, _Env) ->
   Action = <<"disconnected">>,
