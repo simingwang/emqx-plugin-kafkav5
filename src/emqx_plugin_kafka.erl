@@ -123,12 +123,14 @@ on_client_disconnected(ClientInfo = #{clientid := ClientId}, ReasonCode, ConnInf
     {online, Online}
   ],
   produce_kafka_payload(ClientId, Payload),
-  io:format("Client(~s) disconnected due to ~p, ClientInfo:~n~p~n, ConnInfo:~n~p~n",
-              [ClientId, ReasonCode, ClientInfo, ConnInfo]).
+  io:format("Client(~s) disconnected due to ~p, ClientInfo:~n~p~n, ConnInfo:~n~p~n", [ClientId, ReasonCode, ClientInfo, ConnInfo]).
 
-on_client_authenticate(_ClientInfo = #{clientid := ClientId}, Result, _Env) ->
-io:format("Client(~s) authenticate, ClientInfo:~n~p~n, Result:~p,~nEnv:~p~n",
-    [ClientId, ClientInfo, Result, Env]),
+on_client_authenticate(ClientInfo = #{clientid := ClientId}, Result, Env) ->
+io:format("Client(~s) authenticate, ClientInfo:~n~p~n, Result:~p,~nEnv:~p~n", [ClientId, ClientInfo, Result, Env]),
+  {ok, Result}.
+
+on_client_authorize(ClientInfo = #{clientid := ClientId}, PubSub, Topic, Result, Env) ->
+  io:format("Client(~s) authorize, ClientInfo:~n~p~n, ~p to topic(~s) Result:~p,~nEnv:~p~n", [ClientId, ClientInfo, PubSub, Topic, Result, Env]),
   {ok, Result}.
 
 %%---------------------------client subscribe start--------------------------%%
@@ -146,7 +148,8 @@ on_client_subscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) ->
   ],
   produce_kafka_payload(ClientId, Payload),
   io:format("Client(~s) will subscribe: ~p~n", [ClientId, TopicFilters]),
-    {ok, TopicFilters}.
+  {ok, TopicFilters}.
+
 %%---------------------client subscribe stop----------------------%%
 on_client_unsubscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) ->
   %% ?LOG_INFO("[KAFKA PLUGIN]Client(~s) will unsubscribe ~p~n", [ClientId, TopicFilters]),
@@ -161,7 +164,7 @@ on_client_unsubscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) 
   ],
   produce_kafka_payload(ClientId, Payload),
   io:format("Client(~s) will unsubscribe ~p~n", [ClientId, TopicFilters]),
-    {ok, TopicFilters}.
+  {ok, TopicFilters}.
 
 %%--------------------------------------------------------------------
 %% Message PubSub Hooks
@@ -169,11 +172,10 @@ on_client_unsubscribe(#{clientid := ClientId}, _Properties, TopicFilters, _Env) 
 
 %% Transform message and return
 on_message_dropped(#message{topic = <<"$SYS/", _/binary>>}, _By, _Reason, _Env) ->
-    ok;
+ok;
   
 on_message_dropped(Message, _By = #{node := Node}, Reason, _Env) ->
-    io:format("Message dropped by node ~p due to ~p:~n~p~n",
-              [Node, Reason, emqx_message:to_map(Message)]).
+io:format("Message dropped by node ~p due to ~p:~n~p~n",[Node, Reason, emqx_message:to_map(Message)]).
 
 
 %%---------------------------message publish start--------------------------%%
@@ -203,8 +205,7 @@ on_message_delivered(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
     {ts, Timestamp}
   ],
   produce_kafka_payload(ClientId, Content),
-  io:format("Message delivered to client(~s):~n~p~n",
-              [ClientId, emqx_message:to_map(Message)]),
+  io:format("Message delivered to client(~s):~n~p~n", [ClientId, emqx_message:to_map(Message)]),
   {ok, Message}.
 
 on_message_acked(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
@@ -224,8 +225,7 @@ on_message_acked(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
     {ts, Timestamp}
   ],
   produce_kafka_payload(ClientId, Content),
-  io:format("Message acked by client(~s):~n~p~n",
-              [ClientId, emqx_message:to_map(Message)]).
+  io:format("Message acked by client(~s):~n~p~n", [ClientId, emqx_message:to_map(Message)]).
 
 %%--------------------------------------------------------------------
 %% Session LifeCircle Hooks
@@ -250,17 +250,16 @@ on_session_takeovered(_ClientInfo = #{clientid := ClientId}, SessInfo, _Env) ->
     io:format("Session(~s) is takeovered. Session Info: ~p~n", [ClientId, SessInfo]).
 
 on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _Env) ->
-    io:format("Session(~s) is terminated due to ~p~nSession Info: ~p~n",
-              [ClientId, Reason, SessInfo]).
+    io:format("Session(~s) is terminated due to ~p~nSession Info: ~p~n", [ClientId, Reason, SessInfo]).
 
 kafka_init(_Env) ->
-  %% ?LOG_INFO("Start to init emqx plugin kafka..... ~n"),
+  io:format("Start to init emqx plugin kafka..... ~n"),
   {ok, AddressList} = application:get_env(emqx_plugin_kafka, kafka_address_list),
-  %% ?LOG_INFO("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
+  io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
   {ok, KafkaConfig} = application:get_env(emqx_plugin_kafka, kafka_config),
-  %% ?LOG_INFO("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
+  io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
   {ok, KafkaTopic} = application:get_env(emqx_plugin_kafka, topic),
-  %% ?LOG_INFO("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
+  io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   %%{ok, _} = application:ensure_all_started(brod),
   %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
   %%ok = brod:start_producer(emqx_repost_worker, KafkaTopic, []),
@@ -270,7 +269,7 @@ kafka_init(_Env) ->
   %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
   ok = brod:start_client(AddressList, client1),
   ok = brod:start_producer(client1,Topic, _ProducerConfig = []),
-  %% ?LOG_INFO("Init emqx plugin kafka successfully.....~n"),
+  io:format("Init emqx plugin kafka successfully.....~n"),
   ok.
 
 get_kafka_topic() ->
@@ -283,10 +282,10 @@ format_payload(Message) ->
   Topic = Message#message.topic,
   Tail = string:right(binary_to_list(Topic), 4),
   RawType = string:equal(Tail, <<"_raw">>),
-  % ?LOG_INFO("[KAFKA PLUGIN]Tail= ~s , RawType= ~s~n",[Tail,RawType]),
+  io:format("[KAFKA PLUGIN]Tail= ~s , RawType= ~s~n",[Tail,RawType]),
   ClientId = Message#message.from,
   MsgPayload = Message#message.payload,
-  % ?LOG_INFO("[KAFKA PLUGIN]MsgPayload : ~s~n", [MsgPayload]),
+  io:format("[KAFKA PLUGIN]MsgPayload : ~s~n", [MsgPayload]),
   if
     RawType == true ->
       MsgPayload64 = list_to_binary(base64:encode_to_string(MsgPayload));
@@ -329,8 +328,8 @@ unload() ->
 produce_kafka_payload(Key, Message) ->
   Topic = list_to_binary(get_kafka_topic()),
   {ok, MessageBody} = emqx_json:safe_encode(Message),
-  %% ?LOG_INFO("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
-  %% ?LOG_INFO("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
+  io:format("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
+  io:format("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
   Payload = iolist_to_binary(MessageBody),
   %%brod:produce_cb(client1, Topic, hash, Key, Payload, fun(_,_) -> ok end),
   AckCb = fun(Partition, BaseOffset) -> io:format(user, "\nProduced to partition ~p at base-offset ~p\n", [Partition, BaseOffset]) end,
