@@ -66,7 +66,7 @@ fields("emqx_plugin_kafka") ->
                     required => true,
                     desc => ?DESC(topic)
                 }
-            )},
+            )}
     ].
 
 desc("emqx_plugin_kafka") -> ?DESC(emqx_plugin_kafka);
