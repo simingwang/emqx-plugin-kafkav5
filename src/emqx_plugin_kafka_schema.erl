@@ -27,11 +27,11 @@
     desc/1
 ]).
 
-namespace() -> "emqx_plugin_kafka".
+namespace() -> emqx_plugin_kafka.
 
-roots() -> ["emqx_plugin_kafka"].
+roots() -> [emqx_plugin_kafka].
 
-fields("emqx_plugin_kafka") ->
+fields(emqx_plugin_kafka) ->
     [
         {address_list,
             ?HOCON(
@@ -69,5 +69,5 @@ fields("emqx_plugin_kafka") ->
             )}
     ].
 
-desc("emqx_plugin_kafka") -> ?DESC(emqx_plugin_kafka);
+desc(emqx_plugin_kafka) -> "kafka plugin configuration.";
 desc(_) -> undefined.
