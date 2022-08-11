@@ -1,0 +1,7 @@
+{description, "ETCD v3 client template"}.
+{variables,
+ [{unmodified_service_name, "", "Original name of the service, as it'll appear in a request"},
+  {pb_module, "", "Name of protobuf module to get type specs from"},
+  {service_name, [], "Name of the service"},
+  {methods, [], "List of methods for service"}]}.
+{template, "eetcd_sample_client.erl", "{{out_dir}}/clients/eetcd_{{module_name}}_gen.erl"}.

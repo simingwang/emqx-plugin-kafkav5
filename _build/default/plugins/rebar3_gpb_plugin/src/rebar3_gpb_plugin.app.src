@@ -1,0 +1,11 @@
+{application,rebar3_gpb_plugin,
+             [{description,"A rebar3 gpb plugin for compiling .proto files"},
+              {vsn,"2.13.1"},
+              {registered,[]},
+              {applications,[kernel,stdlib,gpb]},
+              {env,[]},
+              {modules,[]},
+              {maintainers,["Luis Rascao"]},
+              {licenses,["MIT"]},
+              {links,[{"Github",
+                       "https://github.com/lrascao/rebar3_gpb_plugin"}]}]}.

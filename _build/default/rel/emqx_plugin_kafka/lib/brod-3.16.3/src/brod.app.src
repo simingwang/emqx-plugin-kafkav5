@@ -1,0 +1,14 @@
+%% -*- mode:erlang -*-
+{application,brod,
+ [{description,"Apache Kafka Erlang client library"},
+  {vsn,"git"},
+  {registered,[]},
+  {applications,[kernel,stdlib,kafka_protocol,supervisor3,snappyer]},
+  {env,[]},
+  {mod, {brod, []}},
+  {modules,[]},
+  {licenses, ["Apache License 2.0"]},
+  {links, [{"Github", "https://github.com/kafka4beam/brod"}]},
+  {build_tools, ["rebar3"]},
+  {files, ["src", "include", "rebar.config", "rebar.config.script",
+           "README.md","LICENSE", "NOTICE", "Makefile"]}]}.

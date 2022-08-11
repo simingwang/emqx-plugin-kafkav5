@@ -13,7 +13,7 @@ data/
 emqx_plugin_template.d
 .DS_Store
 erlang.mk
-_build/
+#_build/
 rebar.lock
 test/ct.cover.spec
 .rebar3

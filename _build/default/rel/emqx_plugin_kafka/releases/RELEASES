@@ -1,0 +1,16 @@
+%% coding: utf-8
+[{release,"emqx_plugin_kafka","5.0.0","12.3",
+          [{emqx_plugin_kafka,"5.0.0","./lib/emqx_plugin_kafka-5.0.0"},
+           {map_sets,"1.1.0","./lib/map_sets-1.1.0"},
+           {brod,"3.16.3","./lib/brod-3.16.3"},
+           {kafka_protocol,"4.0.3","./lib/kafka_protocol-4.0.3"},
+           {crc32cer,"0.1.8","./lib/crc32cer-0.1.8"},
+           {snappyer,"1.2.8","./lib/snappyer-1.2.8"},
+           {kernel,"8.3","./lib/kernel-8.3"},
+           {stdlib,"3.17.1","./lib/stdlib-3.17.1"},
+           {supervisor3,"1.1.11","./lib/supervisor3-1.1.11"},
+           {ssl,"10.7","./lib/ssl-10.7"},
+           {crypto,"5.0.6","./lib/crypto-5.0.6"},
+           {public_key,"1.12","./lib/public_key-1.12"},
+           {asn1,"5.0.18","./lib/asn1-5.0.18"}],
+          permanent}].

@@ -1,0 +1,10 @@
+{application,rebar3_eetcd_plugin,
+             [{description,"Rebar3 plugin to generate client for eetcd"},
+              {vsn,"0.3.0"},
+              {registered,[]},
+              {applications,[kernel,stdlib,gpb,providers]},
+              {env,[]},
+              {modules,[]},
+              {licenses,["Apache 2.0"]},
+              {links,[{"Github",
+                       "https://github.com/zhongwencool/rebar3_eetcd_plugin"}]}]}.

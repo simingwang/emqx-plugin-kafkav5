@@ -1,0 +1,93 @@
+#+TITLE: map_sets
+
+[[https://travis-ci.org/k32/map_sets.svg?branch=master]]
+
+It's a drop-in replacement of OTP =sets= module based on maps. It's
+much faster and simpler, as it makes heavy use of =maps= BIFs.
+
+=sets= interface and sematics are fully preserved, so it should be
+sufficient to just use replace =sets= with =map_sets= in your codebase
+via sed.
+
+* Benchmarks
+A few unscientific crude benchmarks:
+
+#+BEGIN_SRC txt
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz
+Number of Available Cores: 4
+Available memory: 7.74 GB
+Elixir 1.7.4
+Erlang 20.3.8.9
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 28 s
+
+Name                         ips        average  deviation         median         99th %
+sets from_list            215.46        4.64 ms    ±17.34%        4.43 ms        7.94 ms
+map_sets from_list        154.53        6.47 ms    ±14.01%        6.25 ms        9.25 ms
+
+Comparison:
+sets from_list            215.46
+map_sets from_list        154.53 - 1.39x slower
+
+Memory usage statistics:
+
+Name                  Memory usage
+sets from_list            13.09 MB
+map_sets from_list         0.46 MB - 0.04x memory usage
+
+Benchmarking map_sets empty intersection...
+Benchmarking sets empty intersection...
+
+Name                                  ips        average  deviation         median         99th %
+map_sets empty intersection        1.10 K        0.91 ms    ±21.91%        0.84 ms        1.16 ms
+sets empty intersection            0.62 K        1.62 ms     ±3.55%        1.62 ms        1.74 ms
+
+Comparison:
+map_sets empty intersection        1.10 K
+sets empty intersection            0.62 K - 1.79x slower
+
+Memory usage statistics:
+
+Name                           Memory usage
+map_sets empty intersection        0.109 KB
+sets empty intersection           173.25 KB - 1584.00x memory usage
+
+Name                            ips        average  deviation         median         99th %
+sets intersection            573.98        1.74 ms     ±6.34%        1.72 ms        2.15 ms
+map_sets intersection        464.68        2.15 ms    ±26.53%        2.15 ms        4.20 ms
+
+Comparison:
+sets intersection            573.98
+map_sets intersection        464.68 - 1.24x slower
+
+Memory usage statistics:
+
+Name                     Memory usage
+sets intersection             0.25 MB
+map_sets intersection         1.18 MB - 4.80x memory usage
+
+Name                     ips        average  deviation         median         99th %
+map_sets union        2.93 K        0.34 ms    ±24.78%        0.29 ms        0.50 ms
+sets union            0.23 K        4.26 ms    ±10.48%        4.14 ms        5.74 ms
+
+Comparison:
+map_sets union        2.93 K
+sets union            0.23 K - 12.47x slower
+
+Memory usage statistics:
+
+Name              Memory usage
+map_sets union        0.150 MB
+sets union            15.00 MB - 100.30x memory usage
+#+END_SRC
+
+ - [[file:benchmark/intersection.csv][intersection]]
+ - [[file:benchmark/empty%20intersection.csv][intersection (disjoint sets)]]
+ - [[file:benchmark/union.csv][union]]

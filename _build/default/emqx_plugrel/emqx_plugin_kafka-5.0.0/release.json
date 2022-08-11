@@ -1,0 +1,32 @@
+{
+    "authors": [
+        "SimingWong"
+    ],
+    "builder": {
+        "contact": "376210268@qq.com",
+        "name": "SimingWong",
+        "website": "www.emqx.com"
+    },
+    "built_on_otp_release": "24",
+    "compatibility": {
+        "emqx": "~> 5.0"
+    },
+    "date": "2022-08-10",
+    "description": "This is a kafka plugin",
+    "functionality": [
+        "emqx-plugin-kafka"
+    ],
+    "git_ref": "242c4fd6a91a68dd25fbb09e5ba7dd669b32b56f",
+    "metadata_vsn": "0.1.0",
+    "name": "emqx_plugin_kafka",
+    "rel_apps": [
+        "emqx_plugin_kafka-5.0.0",
+        "map_sets-1.1.0",
+        "brod-3.16.3",
+        "kafka_protocol-4.0.3",
+        "crc32cer-0.1.8",
+        "snappyer-1.2.8"
+    ],
+    "rel_vsn": "5.0.0",
+    "repo": "https://github.com/simingwang/emqx-plugin-kafkav5.git"
+}
