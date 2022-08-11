@@ -1,4 +1,0 @@
-emqx_plugin_kafka.address_list = 192.168.0.4:9092,192.168.0.2:9092,192.168.0.3:9092
-emqx_plugin_kafka.reconnect_cool_down_seconds = 10
-emqx_plugin_kafka.query_api_versions = true
-emqx_plugin_kafka.topic = test-topic
