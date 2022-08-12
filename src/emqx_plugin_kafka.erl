@@ -255,10 +255,10 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  AddressList = maps:get(address_list, _Env),
+  AddressList = maps:get(addresslist, _Env),
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  ReconnectCoolDownSeconds = maps:get(reconnect_cool_down_seconds,_Env),
-  QueryApiVersions = maps:get(query_api_versions,_Env),
+  ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
+  QueryApiVersions = maps:get(queryapiversions,_Env),
   % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
   KafkaTopic = maps:get(topic, _Env),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
