@@ -261,7 +261,7 @@ kafka_init(_Env) ->
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   {ok, _} = application:ensure_all_started(brod),
   ok = brod:start_client(AddressList, client1),
-  ok = brod:start_producer(client1, , _ProducerConfig = []),
+  ok = brod:start_producer(client1,KafkaTopic , _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
