@@ -24,19 +24,16 @@
         , stop/1
         ]).
 
--export([ get_kafka_config/0
-        ]).
-
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqx_plugin_kafka_sup:start_link(),
-    Cnf = get_kafka_config(),
+    Cnf = Get_kafka_config(),
     emqx_plugin_kafka:load(Cnf),
     {ok, Sup}.
 
 stop(_State) ->
     emqx_plugin_kafka:unload().
 
-get_kafka_config() ->
+Get_kafka_config() ->
     %case emqx_conf:get_raw([kafka]) of
     %     {config_not_found,[kafka]} ->
             #{

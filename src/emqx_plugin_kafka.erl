@@ -255,12 +255,12 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  AddressList = maps:get(addresslist, _Env),
+  AddressList = Translate(maps:get(addresslist, _Env)）,
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
-  QueryApiVersions = maps:get(queryapiversions,_Env),
+  %ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
+  %QueryApiVersions = maps:get(queryapiversions,_Env),
   % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
-  KafkaTopic = maps:get(topic, _Env),
+  KafkaTopic = list_to_binary(maps:get(topic, _Env)),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   %%{ok, _} = application:ensure_all_started(brod),
   %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
@@ -276,7 +276,7 @@ kafka_init(_Env) ->
 
 get_kafka_topic() ->
   %{ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
-  Topic = <<"test-topic">>.
+  list_to_binary(os:getenv("KAFKA_TOPIC")).
 
 
 format_payload(Message) ->
@@ -344,6 +344,16 @@ ntoa(IP) ->
 now_mill_secs({MegaSecs, Secs, _MicroSecs}) ->
   MegaSecs * 1000000000 + Secs * 1000 + _MicroSecs.
 
+Translate(AddressList) ->
+  Fun = fun(S) ->
+    case string:split(S, ":", trailing) of
+      [Domain]       -> {Domain, 9092};
+      [Domain, Port] -> {Domain, list_to_integer(Port)}
+    end
+  end,
+  S = string:tokens(AddressList, ","),
+  [Fun(S1) || S1 <- S].
+
 hook(HookPoint, MFA) ->
     %% use highest hook priority so this module's callbacks
     %% are evaluated before the default hooks in EMQX
@@ -351,3 +361,5 @@ hook(HookPoint, MFA) ->
 
 unhook(HookPoint, MFA) ->
     emqx_hooks:del(HookPoint, MFA).
+
+
