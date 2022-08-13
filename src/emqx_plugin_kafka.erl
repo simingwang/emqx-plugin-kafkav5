@@ -256,6 +256,7 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
   AddressList = maps:get(addresslist, _Env),
+  if AddressList 
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
   ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
   QueryApiVersions = maps:get(queryapiversions,_Env),
