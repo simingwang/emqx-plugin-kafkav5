@@ -255,7 +255,7 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  AddressList = Translate(maps:get(addresslist, _Env)）,
+  AddressList = translate(maps:get(addresslist, _Env)）,
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
   %ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
   %QueryApiVersions = maps:get(queryapiversions,_Env),
@@ -271,7 +271,7 @@ kafka_init(_Env) ->
   %Topic = <<"test-topic">>,
   %KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
   ok = brod:start_client(AddressList, client1),
-  ok = brod:start_producer(client1, KafkaTopic, _ProducerConfig = []),
+  ok = brod:start_producer(client1, , _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
@@ -344,7 +344,7 @@ ntoa(IP) ->
 now_mill_secs({MegaSecs, Secs, _MicroSecs}) ->
   MegaSecs * 1000000000 + Secs * 1000 + _MicroSecs.
 
-Translate(AddressList) ->
+translate(AddressList) ->
   Fun = fun(S) ->
     case string:split(S, ":", trailing) of
       [Domain]       -> {Domain, 9092};
