@@ -27,7 +27,9 @@
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqx_plugin_kafka_sup:start_link(),
      Cnf = get_kafka_config(),
-     io:format("ApplicationEnv = ~s~n",[application:get_all_env()]),
+     File = filename:join([code:priv_dir(emqx_plugin_kafka), "emqx_plugin_kafka.hocon"]),
+     Cache = hocon_schema:new_desc_cache(File),
+     io:format("ApplicationEnv = ~s~n",[Cache]),
      emqx_plugin_kafka:load(Cnf),
      {ok, Sup}.
 
