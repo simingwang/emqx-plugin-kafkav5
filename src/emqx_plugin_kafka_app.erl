@@ -37,7 +37,7 @@ get_kafka_config() ->
     %case emqx_conf:get_raw([kafka]) of
     %     {config_not_found,[kafka]} ->
             #{
-               addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
+               addresslist => os:getenv("KAFKA_ADDRESS_LIST") ,
                reconnect_cool_down_seconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
                query_api_versions => os:getenv("KAFKA_QUERY_API_VERSIONS") ,
                topic => os:getenv("KAFKA_TOPIC") 
