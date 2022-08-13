@@ -40,10 +40,10 @@ get_kafka_config() ->
     case emqx_conf:get([kafka]) of
         undefined ->
             #{
-               addresslist => os:get_env("KAFKA_ADDRESSLIST") ,
-               reconnectcooldownseconds => os:get_env("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
-               queryapiversions => os:get_env("KAFKA_QUERY_API_VERSIONS") ,
-               topic => os:get_env("KAFKA_TOPIC") 
+               addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
+               reconnectcooldownseconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
+               queryapiversions => os:getenv("KAFKA_QUERY_API_VERSIONS") ,
+               topic => os:getenv("KAFKA_TOPIC") 
             };
         _ ->
             emqx_conf:get([kafka])
