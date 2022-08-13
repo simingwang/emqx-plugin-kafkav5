@@ -3,4 +3,4 @@ kafka {
      reconnectcooldownseconds = 10
      queryapiversions = true
      topic = "test-topic"
-    }
+}
