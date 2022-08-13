@@ -33,30 +33,30 @@ roots() -> [kafka].
 
 fields(kafka) ->
     [
-        {addresslist,
+        {address_list,
             ?HOCON(
                 string(),
                 #{
                     required => true,
-                    desc => ?DESC(addresslist)
+                    desc => ?DESC(address_list)
                 }
             )},
-        {reconnectcooldownseconds,
+        {reconnect_cool_down_seconds,
             ?HOCON(
                 emqx_schema:duration_ms(),
                 #{
                     default => "10s",
                     required => false,
-                    desc => ?DESC(reconnectcooldownseconds)
+                    desc => ?DESC(reconnect_cool_down_seconds)
                 }
             )},
-        {queryapiversions,
+        {query_api_versions,
             ?HOCON(
                 boolean(),
                 #{
                     default => true,
                     required => true,
-                    desc => ?DESC(queryapiversions)
+                    desc => ?DESC(query_api_versions)
                 }
             )},
         {topic,

@@ -1,6 +1,0 @@
-kafka {
-     addresslist = "192.168.0.4:9092,192.168.0.2:9092,192.168.0.3:9092"
-     reconnectcooldownseconds = 10
-     queryapiversions = true
-     topic = "test-topic"
-    }

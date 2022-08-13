@@ -26,9 +26,10 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqx_plugin_kafka_sup:start_link(),
-    Cnf = get_kafka_config(),
-    emqx_plugin_kafka:load(Cnf),
-    {ok, Sup}.
+     Cnf = get_kafka_config(),
+     io:format("ApplicationEnv = ~s~n",[application:get_all_env()]),
+     emqx_plugin_kafka:load(Cnf),
+     {ok, Sup}.
 
 stop(_State) ->
     emqx_plugin_kafka:unload().
@@ -45,4 +46,3 @@ get_kafka_config() ->
     %    _ ->
     %        emqx_conf:get_raw(kafka)
     %end.
-

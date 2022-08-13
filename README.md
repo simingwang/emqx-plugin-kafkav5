@@ -16,14 +16,10 @@ A EMQX plugin release is a zip package including
 Execute `make rel` to have the package created like:
 
 ```
-_build/default/emqx_plugrel/emqx_plugin_template-<vsn>.tar.gz
+_build/default/emqx_plugrel/emqx_plugin_kafka-5.0.0.tar.gz
 ```
-If deploying emqx with build from source.
-See EMQX documents for details on how to deploy the plugin.
 
-1. need to set NIF_BIN_DIR to /usr/lib64  
-   text "export NIF_BIN_DIR = /ust/lib64" to  /etc/profile 
-2. put all plugin's  *.so file to  /usr/lib64
+You can directly install above package to emqx5+ plugins dashboard, and following below guides to setup the env variables.
 
 ######kafka configure in /etc/profile
 set up kafka configuration in env file
@@ -34,6 +30,11 @@ export KAFKA_QUERY_API_VERSIONS=true
 export KAFKA_RECONNECT_COOL_DOWN_SECONDS=10
 ```
 
+If deploying emqx with build from source.
+
+1. need to set NIF_BIN_DIR to /usr/lib64  
+   text "export NIF_BIN_DIR = /ust/lib64" to  /etc/profile 
+2. put all plugin's  *.so file to /usr/lib64
 
 
 
