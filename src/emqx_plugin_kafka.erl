@@ -255,7 +255,7 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  AddressList = translate(maps:get(addresslist, _Env)),
+  AddressList = translate(maps:get(address_list, _Env)),
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
   KafkaTopic = list_to_binary(maps:get(topic, _Env)),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
