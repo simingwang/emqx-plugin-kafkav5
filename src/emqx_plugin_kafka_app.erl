@@ -29,7 +29,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqx_plugin_kafka_sup:start_link(),
-    Cnf = get_kafka_config();
+    Cnf = get_kafka_config(),
     emqx_plugin_kafka:load(Cnf),
     {ok, Sup}.
 
@@ -44,7 +44,7 @@ get_kafka_config() ->
                reconnectcooldownseconds => os:get_env("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
                queryapiversions => os:get_env("KAFKA_QUERY_API_VERSIONS") ,
                topic => os:get_env("KAFKA_TOPIC") 
-            }
+            };
         _ ->
             emqx_conf:get([kafka])
     end.
