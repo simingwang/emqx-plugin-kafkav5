@@ -37,7 +37,7 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case emqx_conf:get([kafka]) of
+    case emqx_conf:get_raw([kafka]) of
         {config_not_found,_} ->
             #{
                addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
