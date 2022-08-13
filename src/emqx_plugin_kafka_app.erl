@@ -46,6 +46,6 @@ get_kafka_config() ->
                topic => os:getenv("KAFKA_TOPIC") 
             };
         _ ->
-            emqx_conf:get([kafka])
+            emqx_conf:get_raw([kafka])
     end.
 
