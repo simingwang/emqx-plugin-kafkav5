@@ -257,25 +257,14 @@ kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
   AddressList = translate(maps:get(addresslist, _Env)),
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  %ReconnectCoolDownSeconds = maps:get(reconnectcooldownseconds,_Env),
-  %QueryApiVersions = maps:get(queryapiversions,_Env),
-  % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
   KafkaTopic = list_to_binary(maps:get(topic, _Env)),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
-  %%{ok, _} = application:ensure_all_started(brod),
-  %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
-  %%ok = brod:start_producer(emqx_repost_worker, KafkaTopic, []),
   {ok, _} = application:ensure_all_started(brod),
-  %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092}],
-  %Topic = list_to_binary(KafkaTopic),
-  %Topic = <<"test-topic">>,
-  %KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
   ok = brod:start_client(AddressList, client1),
   ok = brod:start_producer(client1, , _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
-  %{ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
   list_to_binary(os:getenv("KAFKA_TOPIC")).
 
 
