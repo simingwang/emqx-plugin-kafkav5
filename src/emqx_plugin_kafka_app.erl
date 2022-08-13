@@ -37,8 +37,8 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case emqx_conf:get_raw([kafka]) of
-        {config_not_found,_} ->
+    case emqx_conf:get_raw(kafka) of
+        {config_not_found,kafka} ->
             #{
                addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
                reconnectcooldownseconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
@@ -46,6 +46,6 @@ get_kafka_config() ->
                topic => os:getenv("KAFKA_TOPIC") 
             };
         _ ->
-            emqx_conf:get_raw([kafka])
+            emqx_conf:get_raw(kafka)
     end.
 
