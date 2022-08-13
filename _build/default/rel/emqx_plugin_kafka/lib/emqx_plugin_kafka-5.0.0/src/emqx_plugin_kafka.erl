@@ -59,7 +59,7 @@
 
 %% Called when the plugin application start
 load(Env) ->
-  kafka_init([Env]),
+  kafka_init(Env),
   hook('client.connect',      {?MODULE, on_client_connect, [Env]}),
   hook('client.connack',      {?MODULE, on_client_connack, [Env]}),
   hook('client.connected',    {?MODULE, on_client_connected, [Env]}),
@@ -255,28 +255,17 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
-  AddressList = maps:get(address_list, _Env),
+  AddressList = translate(maps:get(address_list, _Env)),
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  ReconnectCoolDownSeconds = maps:get(reconnect_cool_down_seconds,_Env),
-  QueryApiVersions = maps:get(query_api_versions,_Env),
-  % io:format("[KAFKA PLUGIN]KafkaConfig = ~p~n", [KafkaConfig]),
-  KafkaTopic = maps:get(topic, _Env),
+  KafkaTopic = list_to_binary(maps:get(topic, _Env)),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
-  %%{ok, _} = application:ensure_all_started(brod),
-  %%ok = brod:start_client(AddressList, emqx_repost_worker, KafkaConfig),
-  %%ok = brod:start_producer(emqx_repost_worker, KafkaTopic, []),
   {ok, _} = application:ensure_all_started(brod),
-  %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092}],
-  %Topic = list_to_binary(KafkaTopic),
-  Topic = <<"test-topic">>,
-  KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
-  ok = brod:start_client(KafkaBootstrapEndpoints, client1),
-  ok = brod:start_producer(client1, Topic, _ProducerConfig = []),
+  ok = brod:start_client(AddressList, client1),
+  ok = brod:start_producer(client1,KafkaTopic , _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
-  %{ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
-  Topic = <<"test-topic">>.
+  list_to_binary(os:getenv("KAFKA_TOPIC")).
 
 
 format_payload(Message) ->
@@ -344,6 +333,16 @@ ntoa(IP) ->
 now_mill_secs({MegaSecs, Secs, _MicroSecs}) ->
   MegaSecs * 1000000000 + Secs * 1000 + _MicroSecs.
 
+translate(AddressList) ->
+  Fun = fun(S) ->
+    case string:split(S, ":", trailing) of
+      [Domain]       -> {Domain, 9092};
+      [Domain, Port] -> {Domain, list_to_integer(Port)}
+    end
+  end,
+  S = string:tokens(AddressList, ","),
+  [Fun(S1) || S1 <- S].
+
 hook(HookPoint, MFA) ->
     %% use highest hook priority so this module's callbacks
     %% are evaluated before the default hooks in EMQX
@@ -351,3 +350,5 @@ hook(HookPoint, MFA) ->
 
 unhook(HookPoint, MFA) ->
     emqx_hooks:del(HookPoint, MFA).
+
+

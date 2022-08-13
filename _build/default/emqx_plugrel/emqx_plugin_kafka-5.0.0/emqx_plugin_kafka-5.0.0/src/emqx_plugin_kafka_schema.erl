@@ -27,36 +27,36 @@
     desc/1
 ]).
 
-namespace() -> emqx_plugin_kafka.
+namespace() -> kafka.
 
-roots() -> [emqx_plugin_kafka].
+roots() -> [kafka].
 
-fields(emqx_plugin_kafka) ->
+fields(kafka) ->
     [
-        {address_list,
+        {addresslist,
             ?HOCON(
                 string(),
                 #{
                     required => true,
-                    desc => ?DESC(address_list)
+                    desc => ?DESC(addresslist)
                 }
             )},
-        {reconnect_cool_down_seconds,
+        {reconnectcooldownseconds,
             ?HOCON(
                 emqx_schema:duration_ms(),
                 #{
                     default => "10s",
                     required => false,
-                    desc => ?DESC(reconnect_cool_down_seconds)
+                    desc => ?DESC(reconnectcooldownseconds)
                 }
             )},
-        {query_api_versions,
+        {queryapiversions,
             ?HOCON(
                 boolean(),
                 #{
                     default => true,
                     required => true,
-                    desc => ?DESC(query_api_versions)
+                    desc => ?DESC(queryapiversions)
                 }
             )},
         {topic,
@@ -69,5 +69,5 @@ fields(emqx_plugin_kafka) ->
             )}
     ].
 
-desc(emqx_plugin_kafka) -> "kafka plugin configuration.";
+desc(kafka) -> "kafka plugin configuration.";
 desc(_) -> undefined.

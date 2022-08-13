@@ -11,12 +11,12 @@
     "compatibility": {
         "emqx": "~> 5.0"
     },
-    "date": "2022-08-10",
+    "date": "2022-08-13",
     "description": "This is a kafka plugin",
     "functionality": [
         "emqx-plugin-kafka"
     ],
-    "git_ref": "242c4fd6a91a68dd25fbb09e5ba7dd669b32b56f",
+    "git_ref": "e70da5761fe4c603fdfc56d7a42fd4ac1fde0876",
     "metadata_vsn": "0.1.0",
     "name": "emqx_plugin_kafka",
     "rel_apps": [

@@ -26,9 +26,23 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqx_plugin_kafka_sup:start_link(),
-    emqx_plugin_kafka:load(application:get_all_env()),
+    Cnf = get_kafka_config(),
+    emqx_plugin_kafka:load(Cnf),
     {ok, Sup}.
 
 stop(_State) ->
     emqx_plugin_kafka:unload().
+
+get_kafka_config() ->
+    %case emqx_conf:get_raw([kafka]) of
+    %     {config_not_found,[kafka]} ->
+            #{
+               address_list => os:getenv("KAFKA_ADDRESS_LIST") ,
+               reconnect_cool_down_seconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
+               query_api_versions => os:getenv("KAFKA_QUERY_API_VERSIONS") ,
+               topic => os:getenv("KAFKA_TOPIC") 
+            }.
+    %    _ ->
+    %        emqx_conf:get_raw(kafka)
+    %end.
 
