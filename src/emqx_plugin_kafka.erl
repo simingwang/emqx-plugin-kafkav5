@@ -59,7 +59,7 @@
 
 %% Called when the plugin application start
 load(Env) ->
-  kafka_init([Env]),
+  kafka_init(Env),
   hook('client.connect',      {?MODULE, on_client_connect, [Env]}),
   hook('client.connack',      {?MODULE, on_client_connack, [Env]}),
   hook('client.connected',    {?MODULE, on_client_connected, [Env]}),
