@@ -38,7 +38,7 @@ stop(_State) ->
 
 get_kafka_config() ->
     case emqx_conf:get([kafka]) of
-        undefined ->
+        {config_not_found,_} ->
             #{
                addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
                reconnectcooldownseconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
