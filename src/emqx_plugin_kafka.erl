@@ -268,10 +268,10 @@ kafka_init(_Env) ->
   {ok, _} = application:ensure_all_started(brod),
   %%KafkaBootstrapEndpoints = [{"192.168.0.4", 9092}],
   %Topic = list_to_binary(KafkaTopic),
-  Topic = <<"test-topic">>,
-  KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
-  ok = brod:start_client(KafkaBootstrapEndpoints, client1),
-  ok = brod:start_producer(client1, Topic, _ProducerConfig = []),
+  %Topic = <<"test-topic">>,
+  %KafkaBootstrapEndpoints = [{"192.168.0.4", 9092},{"192.168.0.4", 9093},{"192.168.0.4", 9094}],
+  ok = brod:start_client(AddressList, client1),
+  ok = brod:start_producer(client1, KafkaTopic, _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
