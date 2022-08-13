@@ -37,15 +37,15 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case emqx_conf:get_raw([kafka]) of
-        {config_not_found,[kafka]} ->
+    %case emqx_conf:get_raw([kafka]) of
+    %     {config_not_found,[kafka]} ->
             #{
                addresslist => os:getenv("KAFKA_ADDRESSLIST") ,
                reconnectcooldownseconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
                queryapiversions => os:getenv("KAFKA_QUERY_API_VERSIONS") ,
                topic => os:getenv("KAFKA_TOPIC") 
-            };
-        _ ->
-            emqx_conf:get_raw(kafka)
-    end.
+            }.
+    %    _ ->
+    %        emqx_conf:get_raw(kafka)
+    %end.
 
