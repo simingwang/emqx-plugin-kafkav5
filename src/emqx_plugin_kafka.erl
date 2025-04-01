@@ -255,11 +255,14 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
 
 kafka_init(_Env) ->
   io:format("Start to init emqx plugin kafka..... ~n"),
+  %% Ensure crypto application is loaded first
+  application:ensure_all_started(crypto),
+  {ok, _} = application:ensure_all_started(crc32cer),
+  {ok, _} = application:ensure_all_started(brod),
   AddressList = translate(maps:get(address_list, _Env)),
   io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
   KafkaTopic = list_to_binary(maps:get(topic, _Env)),
   io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
-  {ok, _} = application:ensure_all_started(brod),
   ok = brod:start_client(AddressList, client1),
   ok = brod:start_producer(client1,KafkaTopic , _ProducerConfig = []),
   io:format("Init emqx plugin kafka successfully.....~n").
@@ -318,13 +321,13 @@ unload() ->
 
 produce_kafka_payload(Key, Message) ->
   Topic = get_kafka_topic(),
-  {ok, MessageBody} = emqx_json:safe_encode(Message),
+  MessageBody = jsx:encode(Message),
   io:format("[KAFKA PLUGIN]Message = ~s~n",[MessageBody]),
   io:format("[KAFKA PLUGIN]Topic = ~s~n",[Topic]),
-  Payload = iolist_to_binary(MessageBody),
-  %%brod:produce_cb(client1, Topic, hash, Key, Payload, fun(_,_) -> ok end),
-  AckCb = fun(Partition, BaseOffset) -> io:format(user, "\nProduced to partition ~p at base-offset ~p\n", [Partition, BaseOffset]) end,
-  {ok ,_}= brod:produce_cb(client1, Topic, hash, Key, Payload, AckCb).
+  AckCb = fun(Partition, BaseOffset) -> 
+            io:format(user, "\nProduced to partition ~p at base-offset ~p\n", [Partition, BaseOffset]) 
+          end,
+  brod:produce_cb(client1, Topic, hash, Key, MessageBody, AckCb).
 
 ntoa({0, 0, 0, 0, 0, 16#ffff, AB, CD}) ->
   inet_parse:ntoa({AB bsr 8, AB rem 256, CD bsr 8, CD rem 256});
