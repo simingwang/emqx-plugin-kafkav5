@@ -32,12 +32,28 @@ namespace() -> kafka.
 roots() -> [kafka].
 
 fields(kafka) ->
+    [ {config_path, typerefl:alias(string, #{desc => "外部配置文件路径"})}
+    , {address_list, typerefl:alias(string, #{desc => "Kafka地址列表"})}
+    , {reconnect_cool_down_seconds, typerefl:integer(#{default => 10})}
+    , {query_api_versions, typerefl:boolean(#{default => true})}
+    , {topic, typerefl:alias(string, #{default => "mqtt-publish"})}
+    ].
+
+fields(kafka) ->
     [
+        {config_path,
+            ?HOCON(
+                string(),
+                #{
+                    required => false,
+                    desc => ?DESC(config_path)
+                }
+            )},
         {address_list,
             ?HOCON(
                 string(),
                 #{
-                    required => true,
+                    required => false,
                     desc => ?DESC(address_list)
                 }
             )},
@@ -55,15 +71,24 @@ fields(kafka) ->
                 boolean(),
                 #{
                     default => true,
-                    required => true,
+                    required => false,
                     desc => ?DESC(query_api_versions)
                 }
             )},
+        {mqtt_topics,
+            ?HOCON(
+                {array, string()},
+                #{
+                    required => false,
+                    desc => ?DESC(mqtt_topics)
+                }
+            )},
+        %% 保持向下兼容
         {topic,
             ?HOCON(
                 string(),
                 #{
-                    required => true,
+                    required => false,
                     desc => ?DESC(topic)
                 }
             )}

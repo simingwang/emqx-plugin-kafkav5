@@ -29,19 +29,37 @@ start(_StartType, _StartArgs) ->
     Cnf = get_kafka_config(),
     emqx_plugin_kafka:load(Cnf),
     {ok, Sup}.
-
 stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    %case emqx_conf:get_raw([kafka]) of
-    %     {config_not_found,[kafka]} ->
-            #{
-               address_list => os:getenv("KAFKA_ADDRESS_LIST") ,
-               reconnect_cool_down_seconds => os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS") ,
-               query_api_versions => os:getenv("KAFKA_QUERY_API_VERSIONS") ,
-               topic => os:getenv("KAFKA_TOPIC") 
-            }.
-    %    _ ->
-    %        emqx_conf:get_raw(kafka)
-    %end.
+    case emqx_conf:get([kafka]) of
+        {ok, Config} ->
+            case maps:find(config_path, Config) of
+                {ok, Path} ->
+                    try emqx_conf:load_file(Path) of
+                        {ok, FileConfig} ->
+                            logger:debug("Raw FileConfig structure: ~p", [FileConfig]),
+                            KafkaConfig = maps:get(kafka, FileConfig, fallback_config()),
+                            logger:debug("Effective Kafka config: ~p", [KafkaConfig]),
+                            KafkaConfig;
+                        {error, Reason} ->
+                            logger:error("Failed to load config from ~s: ~p", [Path, Reason]),
+                            fallback_config()
+                    catch
+                        error:{badmatch, {error, enoent}} ->
+                            logger:warning("Config file ~s not found, using default", [Path]),
+                            fallback_config()
+                    end;
+                _ ->
+                    Config
+            end;
+        {error, _} ->
+            fallback_config()
+    end.
+
+fallback_config() ->
+    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
+      reconnect_cool_down_seconds => list_to_integer(os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS", "10")),
+      query_api_versions => list_to_atom(os:getenv("KAFKA_QUERY_API_VERSIONS", "true")),
+      topic => os:getenv("KAFKA_TOPIC", "mqtt-publish")}.

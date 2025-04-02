@@ -56,7 +56,6 @@
         , on_message_dropped/4
         ]).
 
-
 %% Called when the plugin application start
 load(Env) ->
   kafka_init(Env),
@@ -182,7 +181,31 @@ io:format("Message dropped by node ~p due to ~p:~n~p~n",[Node, Reason, emqx_mess
 %%---------------------------message publish start--------------------------%%
 on_message_publish(Message = #message{topic = <<"$SYS/", _/binary>>}, _Env) ->
   {ok, Message};
+
 on_message_publish(Message, _Env) ->
+    Topic = emqx_message:topic(Message),
+    case application:get_env(emqx_plugin_kafka, mqtt_topics, undefined) of
+        undefined ->
+            %% 兼容旧配置
+            DefaultTopic = application:get_env(emqx_plugin_kafka, topic, ""),
+            case emqx_topic:match(Topic, DefaultTopic) of
+                true -> produce_kafka_msg(Message);
+                false -> ok
+            end;
+        Topics ->
+            %% 新配置数组匹配
+            Matched = lists:any(fun(Pattern) -> 
+                emqx_topic:match(Topic, Pattern) 
+            end, Topics),
+            case Matched of
+                true -> produce_kafka_msg(Message);
+                false -> ok
+            end
+    end,
+    {ok, Message}.
+
+produce_kafka_msg(Message) ->
+    %% 原有的Kafka消息生产逻辑
   {ok, ClientId, Payload} = format_payload(Message),
   produce_kafka_payload(ClientId, Payload),
   io:format("Publish ~p~n", [emqx_message:to_map(Message)]),
