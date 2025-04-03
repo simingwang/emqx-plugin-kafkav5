@@ -52,8 +52,7 @@ get_kafka_config() ->
                                 application:set_env(emqx_plugin_kafka, kafka, KafkaConfig),
                                 KafkaConfig
                         end
-                end,
-                Parsed
+                end
             false ->
                 logger:warning("Config file ~s not found, using default", [FixedPath]),
                 fallback_config()
