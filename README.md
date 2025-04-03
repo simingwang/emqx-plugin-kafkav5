@@ -13,7 +13,13 @@ A EMQX plugin release is a zip package including
 1. A JSON format metadata file
 2. A tar file with plugin's apps packed
 
-Execute `make rel` to have the package created like:
+Ensure you have installed OTP 24+ ,git 2.x ,cmake 3.4+ in your environment.
+
+```bash
+make rel
+```
+
+Execute `make rel` in the project folder , if succeeded ,you will have the package created like:
 
 ```
 _build/default/emqx_plugrel/emqx_plugin_kafka-5.0.0.tar.gz
@@ -21,12 +27,14 @@ _build/default/emqx_plugrel/emqx_plugin_kafka-5.0.0.tar.gz
 
 You can directly install above package to emqx5+ plugins dashboard, and following below guides to setup the env variables.
 
-######kafka configure in /etc/profile
+## kafka configuration in /etc/profile
+
 set up kafka configuration in env file
 ```
 export KAFKA_ADDRESS_LIST=192.168.1.1:9092,192.168.1.2:9092,192.168.1.3:9092
 export KAFKA_TOPIC=mqtt-topic
 export KAFKA_QUERY_API_VERSIONS=true
+
 export KAFKA_RECONNECT_COOL_DOWN_SECONDS=10
 ```
 

@@ -33,28 +33,31 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case emqx_conf:get([kafka]) of
-        {ok, Config} ->
-            case maps:find(config_path, Config) of
-                {ok, Path} ->
-                    try emqx_conf:load_file(Path) of
-                        {ok, FileConfig} ->
-                            logger:debug("Raw FileConfig structure: ~p", [FileConfig]),
-                            KafkaConfig = maps:get(kafka, FileConfig, fallback_config()),
-                            logger:debug("Effective Kafka config: ~p", [KafkaConfig]),
-                            KafkaConfig;
-                        {error, Reason} ->
-                            logger:error("Failed to load config from ~s: ~p", [Path, Reason]),
-                            fallback_config()
+    case maps:find(config_path, #{}) of
+        {ok, Path} ->
+            case filelib:is_file(Path) of
+                true ->
+                    try
+                        {ok, Content} = file:read_file(Path),
+                        {ok, Parssed} = hocon:binary(Content, #{format => map}),
+                        case maps:get(kafka, Parssed, undefined) of
+                            undefined ->
+                                logger:error("Missing kafka section in config file ~s", [Path]),
+                                fallback_config();
+                            KafkaConfig ->
+                                logger:debug("Loaded Kafka config from ~s: ~p", [Path, KafkaConfig]),
+                                KafkaConfig
+                        end
                     catch
-                        error:{badmatch, {error, enoent}} ->
-                            logger:warning("Config file ~s not found, using default", [Path]),
+                        _:Error:Reason ->
+                            logger:error("Failed to parse config file ~s: ~p", [Path, {Error, Reason}]),
                             fallback_config()
                     end;
-                _ ->
-                    Config
+                false ->
+                    logger:warning("Config file ~s not found, using default", [Path]),
+                    fallback_config()
             end;
-        {error, _} ->
+        _ ->
             fallback_config()
     end.
 
