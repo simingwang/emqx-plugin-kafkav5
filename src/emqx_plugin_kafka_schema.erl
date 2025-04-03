@@ -32,15 +32,6 @@ namespace() -> kafka.
 roots() -> [kafka].
 
 fields(kafka) ->
-    [ {config_path, typerefl:alias(string, #{desc => "外部配置文件路径"})}
-    , {address_list, typerefl:alias(string, #{desc => "Kafka地址列表"})}
-    , {reconnect_cool_down_seconds, typerefl:integer(#{default => 10})}
-    , {query_api_versions, typerefl:boolean(#{default => true})}
-    , {topic, typerefl:alias(string, #{desc => "kafka主题"})}
-    , {mqtt_topics, typerefl:alias([string], #{desc => "发送至kafka的MQTT主题列表"})}
-    ].
-
-fields(kafka) ->
     [
         {config_path,
             ?HOCON(
