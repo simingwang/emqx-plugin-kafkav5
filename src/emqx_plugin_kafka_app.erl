@@ -34,35 +34,37 @@ stop(_State) ->
 
 get_kafka_config() ->
     FixedPath = "/etc/emqx_kafka.conf",
-    case filelib:is_file(FixedPath) of
-        true ->
-            try
-                {ok, Content} = file:read_file(FixedPath),
-                {ok, Parsed} = hocon:binary(Content, #{format => map}),
-                case maps:get(kafka, Parsed, undefined) of
-                    undefined ->
-                        logger:error("Missing kafka section in config file ~s", [FixedPath]),
+    CNF = 
+        case filelib:is_file(FixedPath) of
+            true ->
+                try
+                    {ok, Content} = file:read_file(FixedPath),
+                    {ok, Parsed} = hocon:binary(Content, #{format => map}),
+                    case maps:get(kafka, Parsed, undefined) of
+                        undefined ->
+                            logger:error("Missing kafka section in config file ~s", [FixedPath]),
+                            fallback_config();
+                        KafkaConfig ->
+                            case maps:get(address_list, KafkaConfig, undefined) of
+                                undefined ->
+                                    logger:error("Missing address_list in kafka config"),
+                                    fallback_config();
+                                _ ->
+                                    application:set_env(emqx_plugin_kafka, kafka, KafkaConfig),
+                                    KafkaConfig
+                            end,
+                    end,
+                    Parsed
+                catch
+                    _:Error:Reason ->
+                        logger:error("Failed to parse config file ~s: ~p", [FixedPath, {Error, Reason}]),
                         fallback_config();
-                    KafkaConfig ->
-                        case maps:get(address_list, KafkaConfig, undefined) of
-                            undefined ->
-                                logger:error("Missing address_list in kafka config"),
-                                fallback_config();
-                            _ ->
-                                application:set_env(emqx_plugin_kafka, kafka, KafkaConfig),
-                                KafkaConfig
-                        end
-                end
-            catch
-                _:Error:Reason ->
-                    logger:error("Failed to parse config file ~s: ~p", [FixedPath, {Error, Reason}]),
-                    fallback_config()
-            end;
-        false ->
-            logger:warning("Config file ~s not found, using default", [FixedPath]),
-            fallback_config()
-    end.
-end.
+                end,
+            false ->
+                logger:warning("Config file ~s not found, using default", [FixedPath]),
+                fallback_config()
+        end,
+    CNF.
 
 fallback_config() ->
     Config = #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
