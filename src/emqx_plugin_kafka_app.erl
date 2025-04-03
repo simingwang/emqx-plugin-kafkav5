@@ -33,6 +33,8 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
+    ALL = application:get_all_env(),
+    logger:info("ALL: ~p", [ALL]),
     case maps:find(config_path, application:get_env(emqx_plugin_kafka, kafka, #{})) of
         {ok, Path} ->
             case filelib:is_file(Path) of
