@@ -47,16 +47,11 @@ get_kafka_config() ->
                                 KafkaConfig ->
                                     case maps:get(address_list, KafkaConfig, undefined) of
                                         undefined ->
-                                            logger:error("Missing address_list in kafka config");
+                                            logger:error("Missing address_list in kafka config"),
+                                            fallback_config();
                                         _ ->
-                                            ok
+                                            KafkaConfig
                                     end
-                            undefined ->
-                                logger:error("Missing kafka section in config file ~s", [Path]),
-                                fallback_config();
-                            KafkaConfig ->
-                                logger:debug("Loaded Kafka config from ~s: ~p", [Path, KafkaConfig]),
-                                KafkaConfig
                         end
                     catch
                         _:Error:Reason ->
@@ -72,7 +67,7 @@ get_kafka_config() ->
     end.
 
 fallback_config() ->
-    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
+    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", "127.0.0.1:9092"), ","),
       reconnect_cool_down_seconds => list_to_integer(os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS", "10")),
       query_api_versions => list_to_atom(os:getenv("KAFKA_QUERY_API_VERSIONS", "true")),
       topic => os:getenv("KAFKA_TOPIC", "mqtt-publish")}.
