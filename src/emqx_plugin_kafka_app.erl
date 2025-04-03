@@ -33,11 +33,8 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    ALL = application:get_all_env(),
-    logger:info("ALL: ~p", [ALL]),
-    case maps:find(config_path, application:get_env(emqx_plugin_kafka, kafka, #{})) of
-        {ok, Path} ->
-            case filelib:is_file(Path) of
+    FixedPath = "/etc/emqx_kafka.conf",
+    case filelib:is_file(FixedPath) of
                 true ->
                     try
                         {ok, Content} = file:read_file(Path),
@@ -52,7 +49,8 @@ get_kafka_config() ->
                                             logger:error("Missing address_list in kafka config"),
                                             fallback_config();
                                         _ ->
-                                            KafkaConfig
+                                            application:set_env(emqx_plugin_kafka, kafka, KafkaConfig),
+                                    KafkaConfig
                                     end
                         end
                     catch
@@ -69,7 +67,9 @@ get_kafka_config() ->
     end.
 
 fallback_config() ->
-    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
+    Config = #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
       reconnect_cool_down_seconds => list_to_integer(os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS", "10")),
       query_api_versions => list_to_atom(os:getenv("KAFKA_QUERY_API_VERSIONS", "true")),
-      topic => os:getenv("KAFKA_TOPIC", "mqtt-publish")}.
+      topic => os:getenv("KAFKA_TOPIC", "mqtt-publish")},
+    application:set_env(emqx_plugin_kafka, kafka, Config),
+    Config.
