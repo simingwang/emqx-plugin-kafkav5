@@ -33,7 +33,7 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case maps:find(config_path, application:get_env(emqx_plugin_kafka, config, #{})) of
+    case maps:find(config_path, application:get_env(emqx_plugin_kafka, kafka, #{})) of
         {ok, Path} ->
             case filelib:is_file(Path) of
                 true ->
@@ -67,7 +67,7 @@ get_kafka_config() ->
     end.
 
 fallback_config() ->
-    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", "127.0.0.1:9092"), ","),
+    #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
       reconnect_cool_down_seconds => list_to_integer(os:getenv("KAFKA_RECONNECT_COOL_DOWN_SECONDS", "10")),
       query_api_versions => list_to_atom(os:getenv("KAFKA_QUERY_API_VERSIONS", "true")),
       topic => os:getenv("KAFKA_TOPIC", "mqtt-publish")}.

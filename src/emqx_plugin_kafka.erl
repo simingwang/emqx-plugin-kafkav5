@@ -291,7 +291,8 @@ kafka_init(_Env) ->
   io:format("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
-  list_to_binary(os:getenv("KAFKA_TOPIC")).
+  {ok, Topic} = application:get_env(emqx_plugin_kafka, topic),
+  list_to_binary(Topic).
 
 
 format_payload(Message) ->
