@@ -37,11 +37,11 @@ get_kafka_config() ->
     case filelib:is_file(FixedPath) of
                 true ->
                     try
-                        {ok, Content} = file:read_file(Path),
+                        {ok, Content} = file:read_file(FixedPath),
                         {ok, Parssed} = hocon:binary(Content, #{format => map}),
                         case maps:get(kafka, Parssed, undefined) of
                                 undefined ->
-                                    logger:error("Missing kafka section in config file ~s", [Path]),
+                                    logger:error("Missing kafka section in config file ~s", [FixedPath]),
                                     fallback_config();
                                 KafkaConfig ->
                                     case maps:get(address_list, KafkaConfig, undefined) of
@@ -55,16 +55,14 @@ get_kafka_config() ->
                         end
                     catch
                         _:Error:Reason ->
-                            logger:error("Failed to parse config file ~s: ~p", [Path, {Error, Reason}]),
+                            logger:error("Failed to parse config file ~s: ~p", [FixedPath, {Error, Reason}]),
                             fallback_config()
                     end;
                 false ->
-                    logger:warning("Config file ~s not found, using default", [Path]),
+                    logger:warning("Config file ~s not found, using default", [FixedPath]),
                     fallback_config()
-            end;
-        _ ->
-            fallback_config()
-    end.
+    end
+end.
 
 fallback_config() ->
     Config = #{address_list => string:tokens(os:getenv("KAFKA_ADDRESS_LIST", ""), ","),
