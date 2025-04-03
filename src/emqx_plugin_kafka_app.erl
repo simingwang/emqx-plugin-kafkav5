@@ -52,7 +52,8 @@ get_kafka_config() ->
                                 _ ->
                                     application:set_env(emqx_plugin_kafka, kafka, KafkaConfig),
                                     KafkaConfig
-                            end,
+                            end
+                    end,
                     end,
                     Parsed
                 catch
