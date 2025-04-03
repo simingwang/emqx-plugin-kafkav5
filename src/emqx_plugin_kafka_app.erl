@@ -54,7 +54,6 @@ get_kafka_config() ->
                                     KafkaConfig
                             end
                     end,
-                    end,
                     Parsed
                 catch
                     _:Error:Reason ->
