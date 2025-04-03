@@ -33,7 +33,7 @@ stop(_State) ->
     emqx_plugin_kafka:unload().
 
 get_kafka_config() ->
-    case maps:find(config_path, #{}) of
+    case maps:find(config_path, application:get_env(emqx_plugin_kafka, config, #{})) of
         {ok, Path} ->
             case filelib:is_file(Path) of
                 true ->
@@ -41,6 +41,16 @@ get_kafka_config() ->
                         {ok, Content} = file:read_file(Path),
                         {ok, Parssed} = hocon:binary(Content, #{format => map}),
                         case maps:get(kafka, Parssed, undefined) of
+                                undefined ->
+                                    logger:error("Missing kafka section in config file ~s", [Path]),
+                                    fallback_config();
+                                KafkaConfig ->
+                                    case maps:get(address_list, KafkaConfig, undefined) of
+                                        undefined ->
+                                            logger:error("Missing address_list in kafka config");
+                                        _ ->
+                                            ok
+                                    end
                             undefined ->
                                 logger:error("Missing kafka section in config file ~s", [Path]),
                                 fallback_config();
