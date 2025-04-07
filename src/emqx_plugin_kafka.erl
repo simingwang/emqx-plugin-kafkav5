@@ -56,7 +56,6 @@
         , on_message_dropped/4
         ]).
 
-
 %% Called when the plugin application start
 load(Env) ->
   kafka_init(Env),
@@ -182,7 +181,31 @@ io:format("Message dropped by node ~p due to ~p:~n~p~n",[Node, Reason, emqx_mess
 %%---------------------------message publish start--------------------------%%
 on_message_publish(Message = #message{topic = <<"$SYS/", _/binary>>}, _Env) ->
   {ok, Message};
+
 on_message_publish(Message, _Env) ->
+  logger:info("before message publish: ~p", [emqx_message:to_map(Message)]),
+  Topic = emqx_message:topic(Message),
+  {ok, KAFKA} = application:get_env(emqx_plugin_kafka, kafka),
+  case maps:get(mqtt_topics, KAFKA, undefined) of
+    undefined ->
+      %% 兼容旧配置
+      logger:info("mqtt_topics not found in config, using old logic"),
+      produce_kafka_msg(Message);
+    Topics ->
+      %% 新配置数组匹配
+      Matched = lists:any(fun(Pattern) -> 
+        emqx_topic:match(Topic, Pattern) 
+        end, Topics),
+      logger:info("mqtt_topics found in config, using new logic, Topic:~p,  Matched: ~p", [Topic,Matched]),
+        case Matched of
+          true -> produce_kafka_msg(Message);
+          false -> ok
+        end
+  end,
+  {ok, Message}.
+
+produce_kafka_msg(Message) ->
+    %% 原有的Kafka消息生产逻辑
   {ok, ClientId, Payload} = format_payload(Message),
   produce_kafka_payload(ClientId, Payload),
   io:format("Publish ~p~n", [emqx_message:to_map(Message)]),
@@ -205,7 +228,7 @@ on_message_delivered(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
     {cluster_node, node()},
     {ts, Timestamp}
   ],
-  produce_kafka_payload(ClientId, Content),
+  %%produce_kafka_payload(ClientId, Content),
   io:format("Message delivered to client(~s):~n~p~n", [ClientId, emqx_message:to_map(Message)]),
   {ok, Message}.
 
@@ -225,7 +248,7 @@ on_message_acked(_ClientInfo = #{clientid := ClientId}, Message, _Env) ->
     {cluster_node, node()},
     {ts, Timestamp}
   ],
-  produce_kafka_payload(ClientId, Content),
+  %%produce_kafka_payload(ClientId, Content),
   io:format("Message acked by client(~s):~n~p~n", [ClientId, emqx_message:to_map(Message)]).
 
 %%--------------------------------------------------------------------
@@ -254,21 +277,24 @@ on_session_terminated(_ClientInfo = #{clientid := ClientId}, Reason, SessInfo, _
     io:format("Session(~s) is terminated due to ~p~nSession Info: ~p~n", [ClientId, Reason, SessInfo]).
 
 kafka_init(_Env) ->
-  io:format("Start to init emqx plugin kafka..... ~n"),
+  logger:info("Start to init emqx plugin kafka..... ~n"),
   %% Ensure crypto application is loaded first
   application:ensure_all_started(crypto),
   {ok, _} = application:ensure_all_started(crc32cer),
   {ok, _} = application:ensure_all_started(brod),
   AddressList = translate(maps:get(address_list, _Env)),
-  io:format("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
-  KafkaTopic = list_to_binary(maps:get(topic, _Env)),
-  io:format("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
+  logger:info("[KAFKA PLUGIN]KafkaAddressList = ~p~n", [AddressList]),
+  KafkaTopic = get_kafka_topic(),
+  logger:info("[KAFKA PLUGIN]KafkaTopic = ~s~n", [KafkaTopic]),
   ok = brod:start_client(AddressList, client1),
-  ok = brod:start_producer(client1,KafkaTopic , _ProducerConfig = []),
-  io:format("Init emqx plugin kafka successfully.....~n").
+  ok = brod:start_producer(client1, KafkaTopic , _ProducerConfig = []),
+  logger:info("Init emqx plugin kafka successfully.....~n").
 
 get_kafka_topic() ->
-  list_to_binary(os:getenv("KAFKA_TOPIC")).
+  logger:info("all envs: ~p~n", [application:get_all_env(emqx_plugin_kafka)]),
+  {OK, CONF} =  application:get_env(emqx_plugin_kafka,kafka),
+  Topic = maps:get(topic, CONF),
+  Topic.
 
 
 format_payload(Message) ->
@@ -343,7 +369,7 @@ translate(AddressList) ->
       [Domain, Port] -> {Domain, list_to_integer(Port)}
     end
   end,
-  S = string:tokens(AddressList, ","),
+  S = string:tokens(binary_to_list(AddressList), ","),
   [Fun(S1) || S1 <- S].
 
 hook(HookPoint, MFA) ->
